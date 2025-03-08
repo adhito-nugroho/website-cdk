@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#2e7d32" />
+    <title>CDK Wilayah Bojonegoro - Dinas Kehutanan Provinsi Jawa Timur</title>
+
+    <!-- CSS Libraries -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/swiper/swiper-bundle.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@accessibility-community/accessible-dark-mode@1.0.0/style.css"
+    />
+
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Dashboard Styles -->
+    <style>
+      /* Global Spacing */
+      :root {
+        --section-spacing: 6rem;
+        --section-spacing-sm: 4rem;
+        --content-spacing: 2rem;
+        --navbar-height: 80px;
+      }
+
+      /* Base Layout */
+      html {
+        scroll-padding-top: var(--navbar-height);
+        scroll-behavior: smooth;
+      }
+
+      body {
+        padding-top: var(--navbar-height); /* Kompensasi untuk fixed navbar */
+      }
+
+      /* Navbar */
+      .navbar {
+        height: var(--navbar-height);
+        background: rgba(27, 67, 50, 0.95);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+        z-index: 1030;
+      }
+
+      .navbar.scrolled {
+        background: rgba(27, 67, 50, 0.98);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .nav-link {
+        color: rgba(255, 255, 255, 0.9) !important;
+        font-weight: 500;
+        padding: 0.5rem 1rem !important;
+        transition: all 0.3s ease;
+      }
+
+      .nav-link:hover,
+      .nav-link.active {
+        color: #ffffff !important;
+      }
+
+      /* Section Base */
+      section {
+        padding: var(--section-spacing) 0;
+        position: relative;
+        overflow: visible;
+      }
+
+      /* Hero Section */
+      .hero-section {
+        padding: 0;
+        height: 100vh;
+        min-height: 600px;
+        display: flex;
+        align-items: center;
+        margin-top: calc(-1 * var(--navbar-height));
+      }
+
+      .hero-video-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+      }
+
+      .hero-video-bg video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(45, 106, 79, 0.8), rgba(27, 67, 50, 0.85));
+        z-index: 2;
+      }
+
+      #particles-js {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 3;
+        opacity: 0.3;
+      }
+
+      .hero-content-wrapper {
+        position: relative;
+        z-index: 4;
+        width: 100%;
+        padding: 0 1.5rem;
+      }
+
+      .hero-content {
+        max-width: 800px;
+        margin: 0 auto;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
+        padding: 3.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+      }
+
+      /* Section Headers */
+      .section-header {
+        margin-bottom: var(--section-spacing-sm);
+        text-align: center;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+        position: relative;
+        z-index: 10;
+        padding: 1rem 0;
+        background: linear-gradient(to bottom, var(--bg-white) 50%, transparent);
+      }
+
+      .section-header h2 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: var(--text-dark);
+        font-weight: 700;
+      }
+
+      .section-header .section-subheading {
+        font-size: 1.1rem;
+        color: var(--text-medium);
+        line-height: 1.6;
+      }
+
+      /* Content z-index */
+      .section-content {
+        position: relative;
+        z-index: 1;
+        margin-top: -50px;
+        padding-top: 50px;
+      }
+
+      /* Dashboard Cards */
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+        margin-top: var(--content-spacing);
+        position: relative;
+        z-index: 1;
+        padding-top: 2rem;
+      }
+
+      .dashboard-card {
+        background: var(--bg-white);
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow-md);
+        transition: all 0.3s ease;
+        transform: translateY(0); /* Reset transform */
+        opacity: 1; /* Reset opacity */
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .card-header h4 {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0;
+        font-size: 1.2rem;
+      }
+
+      .chart-container {
+        height: 300px;
+        position: relative;
+      }
+
+      /* Responsive */
+      @media (max-width: 991px) {
+        :root {
+          --section-spacing: 5rem;
+          --section-spacing-sm: 3rem;
+          --navbar-height: 70px;
+        }
+
+        .section-header h2 {
+          font-size: 2rem;
+        }
+      }
+
+      @media (max-width: 768px) {
+        :root {
+          --section-spacing: 4rem;
+          --section-spacing-sm: 2.5rem;
+          --content-spacing: 1.5rem;
+          --navbar-height: 60px;
+        }
+
+        .hero-content {
+          padding: 2rem;
+        }
+
+        .dashboard-grid {
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
+        }
+
+        .section-header h2 {
+          font-size: 1.75rem;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .hero-content {
+          padding: 1.5rem;
+          margin: 0 1rem;
+        }
+
+        .container {
+          padding: 0 1rem;
+        }
+      }
+
+      /* Update ScrollReveal animations */
+      [data-aos] {
+        pointer-events: all !important;
+      }
+
+      /* Update specific sections background */
+      .profile-section {
+        background: var(--bg-light);
+      }
+
+      .stats-dashboard {
+        background: var(--bg-white);
+        position: relative;
+      }
+
+      .monitoring-section {
+        background: var(--bg-light);
+      }
+
+      /* Remove background from section header */
+      .section-header {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+      }
+
+      /* Update dashboard cards */
+      .dashboard-grid {
+        position: relative;
+        z-index: 1;
+        margin-top: 2rem;
+      }
+
+      .dashboard-card {
+        background: var(--bg-white);
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow-md);
+        transition: all 0.3s ease;
+      }
+    </style>
+
+    <!-- Di bagian head, setelah CSS libraries yang ada -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script src="https://unpkg.com/scrollreveal"></script>
+  </head>
+  <body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay">
+      <div class="loading-animation"></div>
+    </div>
+
+    <!-- Skip Link for Accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="#">
+          <img
+            src="assets/images/logo.png"
+            alt="Logo CDK Bojonegoro"
+            height="40"
+          />
+          CDK Wilayah Bojonegoro
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="#beranda">Beranda</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#profil">Profil</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#layanan">Layanan</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#program">Program</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#monitoring">Monitoring</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#publikasi">Publikasi</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#kontak">Kontak</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="beranda" class="hero-section">
+      <div id="particles-js"></div>
+      <div class="hero-video-bg">
+        <video autoplay muted loop playsinline>
+          <source src="assets/videos/forest-bg.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div class="hero-content-wrapper">
+        <div class="hero-content">
+          <h1 data-aos="fade-up">Cabang Dinas Kehutanan Wilayah Bojonegoro</h1>
+          <p data-aos="fade-up" data-aos-delay="100">
+            Melayani masyarakat dalam pengelolaan dan pelestarian hutan
+          </p>
+          <div class="hero-buttons" data-aos="fade-up" data-aos-delay="200">
+            <a href="#layanan" class="btn btn-success">
+              Layanan Kami <i class="ri-arrow-right-line"></i>
+            </a>
+            <a href="#kontak" class="btn btn-outline-light">
+              Hubungi Kami <i class="ri-customer-service-line"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Floating Stats Section -->
+    <section class="stats-section">
+      <div class="stats-grid">
+        <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="stat-icon">
+            <i class="ri-plant-line"></i>
+          </div>
+          <h3 class="stat-number" data-counter="10000">10,000+</h3>
+          <p class="stat-label">Pohon Ditanam</p>
+        </div>
+
+        <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="stat-icon">
+            <i class="ri-team-line"></i>
+          </div>
+          <h3 class="stat-number" data-counter="500">500+</h3>
+          <p class="stat-label">Kelompok Tani</p>
+        </div>
+
+        <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+          <div class="stat-icon">
+            <i class="ri-landscape-line"></i>
+          </div>
+          <h3 class="stat-number" data-counter="50000">50,000</h3>
+          <p class="stat-label">Hektar Hutan</p>
+        </div>
+
+        <div class="stat-card" data-aos="fade-up" data-aos-delay="400">
+          <div class="stat-icon">
+            <i class="ri-government-line"></i>
+          </div>
+          <h3 class="stat-number" data-counter="15">15</h3>
+          <p class="stat-label">Resort</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Profil Section -->
+    <section id="profil" class="profile-section">
+      <div class="container">
+        <div class="section-header text-center" data-aos="fade-up">
+          <h2>Profil CDK Wilayah Bojonegoro</h2>
+          <p class="section-subheading">
+            Unit Pelaksana Teknis Dinas Kehutanan Provinsi Jawa Timur
+          </p>
+        </div>
+
+        <div class="row g-4">
+          <!-- Wilayah Kerja -->
+          <div class="col-lg-6" data-aos="fade-up">
+            <div class="profile-card glass-card">
+              <div class="card-header-custom">
+                <div class="header-icon">
+                  <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <h4>Wilayah Kerja</h4>
+              </div>
+              <div class="wilayah-list">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="wilayah-item">
+                      <i class="fas fa-circle-check"></i>
+                      <span>Kabupaten Bojonegoro</span>
+                    </div>
+                    <div class="wilayah-item">
+                      <i class="fas fa-circle-check"></i>
+                      <span>Kabupaten Tuban</span>
+                    </div>
+                    <div class="wilayah-item">
+                      <i class="fas fa-circle-check"></i>
+                      <span>Kabupaten Lamongan</span>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="wilayah-item">
+                      <i class="fas fa-circle-check"></i>
+                      <span>Kabupaten Gresik</span>
+                    </div>
+                    <div class="wilayah-item">
+                      <i class="fas fa-circle-check"></i>
+                      <span>Kabupaten Sidoarjo</span>
+                    </div>
+                    <div class="wilayah-item">
+                      <i class="fas fa-circle-check"></i>
+                      <span>Kota Surabaya</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div id="map" class="wilayah-map mt-4"></div>
+            </div>
+          </div>
+
+          <!-- Tugas dan Fungsi -->
+          <div class="col-lg-6" data-aos="fade-up">
+            <div class="profile-card glass-card">
+              <div class="card-header-custom">
+                <div class="header-icon">
+                  <i class="fas fa-tasks"></i>
+                </div>
+                <h4>Tugas dan Fungsi</h4>
+              </div>
+              <div class="tugas-content">
+                <h5>Tugas Pokok</h5>
+                <p>
+                  Membantu Kepala Dinas Kehutanan melaksanakan sebagian urusan
+                  pemerintahan yang menjadi kewenangan Provinsi di wilayah
+                  kerja.
+                </p>
+
+                <h5 class="mt-4">Fungsi Utama</h5>
+                <div class="fungsi-list">
+                  <div class="fungsi-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Penyusunan perencanaan program dan anggaran</span>
+                  </div>
+                  <div class="fungsi-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span
+                      >Pelaksanaan pelayanan, pemantauan, dan pengawasan
+                      kehutanan</span
+                    >
+                  </div>
+                  <div class="fungsi-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Pembinaan dan pengembangan hutan hak</span>
+                  </div>
+                  <div class="fungsi-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Rehabilitasi dan konservasi hutan</span>
+                  </div>
+                  <div class="fungsi-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Penyuluhan dan pemberdayaan masyarakat</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Struktur Organisasi -->
+          <div class="col-12" data-aos="fade-up">
+            <div class="profile-card">
+              <div class="card-header-custom">
+                <div class="header-icon">
+                  <i class="fas fa-sitemap"></i>
+                </div>
+                <h4>Struktur Organisasi</h4>
+              </div>
+              <div class="struktur-organisasi py-5">
+                <div class="org-tree">
+                  <!-- Kepala CDK -->
+                  <div class="org-level">
+                    <div class="org-item">
+                      <div class="org-content primary">
+                        <div class="org-box">
+                          <div class="org-icon">
+                            <i class="fas fa-user-tie mb-2"></i>
+                          </div>
+                          <h5 class="fw-bold mb-2">
+                            Kepala Cabang Dinas Kehutanan
+                          </h5>
+                          <p class="mb-0">
+                            Pimpinan dan penanggung jawab CDK Wilayah Bojonegoro
+                          </p>
+                        </div>
+                        <div class="org-connector"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Sub Bagian -->
+                  <div class="org-level">
+                    <div class="org-item">
+                      <div class="org-content secondary">
+                        <div class="org-box">
+                          <div class="org-icon">
+                            <i class="fas fa-tasks mb-2"></i>
+                          </div>
+                          <h5 class="fw-bold mb-2">Sub Bagian Tata Usaha</h5>
+                          <p class="mb-0">
+                            Administrasi, kepegawaian, keuangan, dan umum
+                          </p>
+                        </div>
+                        <div class="org-connector"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Seksi-seksi -->
+                  <div class="org-level">
+                    <div class="org-item-wrapper">
+                      <div class="org-item">
+                        <div class="org-content tertiary">
+                          <div class="org-box">
+                            <div class="org-icon">
+                              <i class="fas fa-seedling mb-2"></i>
+                            </div>
+                            <h5 class="fw-bold mb-2">
+                              Seksi Rehabilitasi Lahan dan Pemberdayaan
+                              Masyarakat
+                            </h5>
+                            <p class="mb-0">
+                              Rehabilitasi hutan dan pemberdayaan masyarakat
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="org-item">
+                        <div class="org-content tertiary">
+                          <div class="org-box">
+                            <div class="org-icon">
+                              <i class="fas fa-chart-line mb-2"></i>
+                            </div>
+                            <h5 class="fw-bold mb-2">
+                              Seksi Tata Kelola dan Usaha Kehutanan
+                            </h5>
+                            <p class="mb-0">
+                              Perizinan dan pengembangan usaha kehutanan
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Layanan Section -->
+    <section id="layanan" class="services-section">
+      <div class="container">
+        <div class="section-header text-center" data-aos="fade-up">
+          <h2>Layanan Kehutanan</h2>
+          <p class="section-subheading">
+            Pelayanan teknis bidang kehutanan sesuai wilayah kerja
+          </p>
+        </div>
+
+        <div class="row g-4">
+          <!-- Perizinan & Sertifikasi -->
+          <div class="col-lg-4" data-aos="fade-up">
+            <div class="service-card glass-card">
+              <div class="service-icon-wrapper">
+                <i class="fas fa-file-signature service-icon"></i>
+              </div>
+              <div class="service-content">
+                <h4>Perizinan & Sertifikasi</h4>
+                <ul class="service-list">
+                  <li>
+                    <i class="fas fa-check-circle"></i> Pendampingan perizinan
+                    industri primer hasil hutan
+                  </li>
+                  <li>
+                    <i class="fas fa-check-circle"></i> Sertifikasi hutan hak
+                    dan industri primer kayu
+                  </li>
+                  <li>
+                    <i class="fas fa-check-circle"></i> Verifikasi dokumen hasil
+                    hutan
+                  </li>
+                  <li>
+                    <i class="fas fa-check-circle"></i> Monitoring dan evaluasi
+                    perizinan
+                  </li>
+                </ul>
+                <div class="service-action">
+                  <a href="#" class="btn btn-success mt-3">Ajukan Permohonan</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rehabilitasi & Konservasi -->
+          <div class="col-lg-4" data-aos="fade-up">
+            <div class="service-card glass-card">
+              <div class="service-icon-wrapper">
+                <i class="fas fa-seedling service-icon"></i>
+              </div>
+              <div class="service-content">
+                <h4>Rehabilitasi & Konservasi</h4>
+                <ul class="service-list">
+                  <li>
+                    <i class="fas fa-check-circle"></i> Rehabilitasi lahan
+                    kritis
+                  </li>
+                  <li>
+                    <i class="fas fa-check-circle"></i> Konservasi tanah dan air
+                  </li>
+                  <li>
+                    <i class="fas fa-check-circle"></i> Pengelolaan DAS terpadu
+                  </li>
+                  <li>
+                    <i class="fas fa-check-circle"></i> Pembinaan kawasan
+                    ekosistem esensial
+                  </li>
+                </ul>
+                <div class="service-action">
+                  <a href="#" class="btn btn-success mt-3"
+                    >Program Rehabilitasi</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pemberdayaan Masyarakat -->
+          <div class="col-lg-4" data-aos="fade-up">
+            <div class="service-card glass-card">
+              <div class="service-icon-wrapper">
+                <i class="fas fa-users service-icon"></i>
+              </div>
+              <div class="service-content">
+                <h4>Pemberdayaan Masyarakat</h4>
+                <ul class="service-list">
+                  <li>
+                    <i class="fas fa-check-circle"></i> Program perhutanan
+                    sosial
+                  </li>
+                  <li>
+                    <i class="fas fa-check-circle"></i> Pendampingan kelompok
+                    tani hutan
+                  </li>
+                  <li>
+                    <i class="fas fa-check-circle"></i> Penyuluhan kehutanan
+                  </li>
+                  <li>
+                    <i class="fas fa-check-circle"></i> Pembinaan usaha
+                    kehutanan masyarakat
+                  </li>
+                </ul>
+                <div class="service-action">
+                  <a href="#" class="btn btn-success mt-3">Daftar Program</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pengawasan & Pengendalian -->
+          <div class="col-lg-4" data-aos="fade-up">
+            <div class="service-card glass-card">
+              <div class="service-icon-wrapper">
+                <i class="fas fa-shield-alt service-icon"></i>
+              </div>
+              <div class="service-content">
+                <h4>Pengawasan & Pengendalian</h4>
+                <ul class="service-list">
+                  <li>
+                    <i class="fas fa-check-circle"></i> Pengendalian pemanfaatan
+                    tumbuhan/satwa liar non-CITES
+                  </li>
+                  <li>
+                    <i class="fas fa-check-circle"></i> Monitoring potensi hutan
+                  </li>
+                  <li>
+                    <i class="fas fa-check-circle"></i> Evaluasi kinerja
+                    industri kehutanan
+                  </li>
+                  <li>
+                    <i class="fas fa-check-circle"></i> Perlindungan hutan
+                  </li>
+                </ul>
+                <div class="service-action">
+                  <a href="#" class="btn btn-success mt-3"
+                    >Layanan Pengawasan</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="program" class="program-section">
+      <div class="container">
+        <div class="section-header text-center" data-aos="fade-up">
+          <h2>Program & Kegiatan</h2>
+          <p class="section-subheading">Program dan kegiatan teknis bidang kehutanan sesuai Pergub No 48 Tahun 2018</p>
+        </div>
+    
+        <div class="program-grid">
+          <!-- Perencanaan dan Tata Hutan -->
+          <div class="program-card" data-aos="fade-up">
+            <div class="program-header">
+              <div class="program-icon">
+                <i class="ri-draft-line"></i>
+              </div>
+              <div class="program-title">
+                <h4>Perencanaan & Tata Hutan</h4>
+                <p>Perencanaan, pengukuhan dan penatagunaan kawasan hutan</p>
+              </div>
+            </div>
+            <div class="program-content">
+              <ul class="program-list">
+                <li>
+                  <i class="ri-check-line"></i>
+                  <span>Inventarisasi dan pemetaan kawasan hutan</span>
+                </li>
+                <li>
+                  <i class="ri-check-line"></i>
+                  <span>Pengukuhan dan penatagunaan kawasan hutan</span>
+                </li>
+                <li>
+                  <i class="ri-check-line"></i>
+                  <span>Penyusunan rencana pengelolaan hutan</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+    
+          <!-- Pemanfaatan & Penggunaan Kawasan -->
+          <div class="program-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="program-header">
+              <div class="program-icon">
+                <i class="ri-plant-line"></i>
+              </div>
+              <div class="program-title">
+                <h4>Pemanfaatan Hutan</h4>
+                <p>Pemanfaatan dan penggunaan kawasan hutan</p>
+              </div>
+            </div>
+            <div class="program-content">
+              <ul class="program-list">
+                <li>
+                  <i class="ri-check-line"></i>
+                  <span>Pemanfaatan kawasan, jasa lingkungan dan hasil hutan</span>
+                </li>
+                <li>
+                  <i class="ri-check-line"></i>
+                  <span>Penggunaan dan perubahan peruntukan kawasan hutan</span>
+                </li>
+                <li>
+                  <i class="ri-check-line"></i>
+                  <span>Pengelolaan iuran dan peredaran hasil hutan</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+    
+          <!-- Rehabilitasi Hutan -->
+          <div class="program-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="program-header">
+              <div class="program-icon">
+                <i class="ri-seedling-line"></i>
+              </div>
+              <div class="program-title">
+                <h4>Rehabilitasi Hutan</h4>
+                <p>Rehabilitasi hutan dan lahan kritis</p>
+              </div>
+            </div>
+            <div class="program-content">
+              <ul class="program-list">
+                <li>
+                  <i class="ri-check-line"></i>
+                  <span>Rehabilitasi hutan dan lahan kritis</span>
+                </li>
+                <li>
+                  <i class="ri-check-line"></i>
+                  <span>Perbenihan tanaman hutan</span>
+                </li>
+                <li>
+                  <i class="ri-check-line"></i>
+                  <span>Pengelolaan DAS dan perhutanan sosial</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+    
+          <!-- Perlindungan Hutan -->
+          <div class="program-card" data-aos="fade-up" data-aos-delay="300">
+            <div class="program-header">
+              <div class="program-icon">
+                <i class="ri-shield-check-line"></i>
+              </div>
+              <div class="program-title">
+                <h4>Perlindungan Hutan</h4>
+                <p>Perlindungan dan pengamanan hutan</p>
+              </div>
+            </div>
+            <div class="program-content">
+              <ul class="program-list">
+                <li>
+                  <i class="ri-check-line"></i>
+                  <span>Pengamanan dan penegakan hukum kehutanan</span>
+                </li>
+                <li>
+                  <i class="ri-check-line"></i>
+                  <span>Pengendalian kebakaran hutan dan lahan</span>
+                </li>
+                <li>
+                  <i class="ri-check-line"></i>
+                  <span>Pengendalian kerusakan ekosistem hutan</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Setelah section program dan sebelum section monitoring -->
+    <section id="statistik" class="stats-dashboard">
+      <div class="container">
+        <div class="section-header text-center" data-aos="fade-up">
+          <h2>Data & Statistik Kehutanan</h2>
+          <p class="section-subheading">Informasi dan visualisasi data kehutanan wilayah Bojonegoro</p>
+        </div>
+
+        <div class="dashboard-grid">
+          <!-- Luas Kawasan Hutan -->
+          <div class="dashboard-card" data-aos="fade-up">
+            <div class="card-header">
+              <h4><i class="ri-landscape-line"></i> Luas Kawasan Hutan</h4>
+              <select class="year-select">
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+              </select>
+            </div>
+            <div class="chart-container">
+              <canvas id="forestAreaChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Produksi Hasil Hutan -->
+          <div class="dashboard-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="card-header">
+              <h4><i class="ri-plant-line"></i> Produksi Hasil Hutan</h4>
+              <select class="year-select">
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+              </select>
+            </div>
+            <div class="chart-container">
+              <canvas id="forestProductionChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Monitoring Section -->
+    <section id="monitoring" class="monitoring-section">
+      <div class="container">
+        <div class="section-header text-center" data-aos="fade-up">
+          <h2>Monitoring & Evaluasi</h2>
+          <p class="section-subheading">
+            Pemantauan dan evaluasi kegiatan kehutanan
+          </p>
+        </div>
+
+        <div class="row g-4">
+          <!-- Statistik Kehutanan -->
+          <div class="col-lg-6" data-aos="fade-up">
+            <div class="monitoring-card">
+              <div class="card-header">
+                <i class="fas fa-chart-bar icon-header"></i>
+                <h4>Statistik Kehutanan</h4>
+              </div>
+              <div class="stats-container">
+                <canvas id="forestStats"></canvas>
+                <div class="stats-summary">
+                  <div class="stat-item">
+                    <div class="stat-icon">
+                      <i class="fas fa-tree"></i>
+                    </div>
+                    <div class="stat-info">
+                      <span class="stat-label">Luas Hutan Produksi</span>
+                      <span class="stat-value">45,000 Ha</span>
+                    </div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-icon">
+                      <i class="fas fa-leaf"></i>
+                    </div>
+                    <div class="stat-info">
+                      <span class="stat-label">Hutan Rakyat</span>
+                      <span class="stat-value">15,000 Ha</span>
+                    </div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-icon">
+                      <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                      <span class="stat-label">Kelompok Tani</span>
+                      <span class="stat-value">120 Kelompok</span>
+                    </div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-icon">
+                      <i class="fas fa-industry"></i>
+                    </div>
+                    <div class="stat-info">
+                      <span class="stat-label">Industri Primer</span>
+                      <span class="stat-value">45 Unit</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Capaian Program -->
+          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+            <div class="monitoring-card">
+              <div class="card-header">
+                <i class="fas fa-tasks icon-header"></i>
+                <h4>Capaian Program</h4>
+              </div>
+              <div class="progress-list">
+                <div class="progress-item">
+                  <div class="progress-header">
+                    <div class="progress-title">
+                      <i class="fas fa-seedling progress-icon"></i>
+                      <span>Rehabilitasi Lahan</span>
+                    </div>
+                    <span class="progress-percentage">75%</span>
+                  </div>
+                  <div class="progress">
+                    <div class="progress-bar" style="width: 75%">
+                      <div class="progress-glow"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="progress-item">
+                  <div class="progress-header">
+                    <div class="progress-title">
+                      <i class="fas fa-hands-helping progress-icon"></i>
+                      <span>Perhutanan Sosial</span>
+                    </div>
+                    <span class="progress-percentage">80%</span>
+                  </div>
+                  <div class="progress">
+                    <div class="progress-bar" style="width: 80%">
+                      <div class="progress-glow"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="progress-item">
+                  <div class="progress-header">
+                    <div class="progress-title">
+                      <i class="fas fa-leaf progress-icon"></i>
+                      <span>Pembibitan</span>
+                    </div>
+                    <span class="progress-percentage">90%</span>
+                  </div>
+                  <div class="progress">
+                    <div class="progress-bar" style="width: 90%">
+                      <div class="progress-glow"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="progress-item">
+                  <div class="progress-header">
+                    <div class="progress-title">
+                      <i class="fas fa-chalkboard-teacher progress-icon"></i>
+                      <span>Penyuluhan</span>
+                    </div>
+                    <span class="progress-percentage">85%</span>
+                  </div>
+                  <div class="progress">
+                    <div class="progress-bar" style="width: 85%">
+                      <div class="progress-glow"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Publikasi Section -->
+    <section id="publikasi" class="publication-section">
+      <div class="container py-5">
+        <div class="section-header text-center mb-5" data-aos="fade-up">
+          <h2>Publikasi & Informasi</h2>
+          <p class="section-subheading">Berita terkini dan dokumen penting terkait kehutanan</p>
+        </div>
+
+        <div class="row g-4">
+          <!-- Berita Terkini -->
+          <div class="col-lg-8" data-aos="fade-up">
+            <div class="row g-4">
+              <!-- Berita 1 -->
+              <div class="col-md-6">
+                <div class="news-card animate-hover">
+                  <img src="assets/images/news/penanaman.jpg" alt="Penanaman Pohon" class="news-image">
+                  <div class="news-content">
+                    <span class="news-tag">Program</span>
+                    <h5>Penanaman 10.000 Bibit Pohon di Kawasan Hutan Lindung</h5>
+                    <p>Program penanaman pohon sebagai upaya rehabilitasi hutan dan lahan kritis telah dilaksanakan dengan melibatkan masyarakat sekitar hutan dan stakeholder terkait.</p>
+                    <div class="news-meta">
+                      <span><i class="ri-calendar-line"></i> 12 Feb 2025</span>
+                      <a href="#" class="read-more">Baca Selengkapnya <i class="ri-arrow-right-line"></i></a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Berita 2 -->
+              <div class="col-md-6">
+                <div class="news-card animate-hover">
+                  <img src="assets/images/news/perhutanan-sosial.jpg" alt="Perhutanan Sosial" class="news-image">
+                  <div class="news-content">
+                    <span class="news-tag">Pemberdayaan</span>
+                    <h5>Penguatan Kelembagaan Kelompok Tani Hutan</h5>
+                    <p>Kegiatan penguatan kelembagaan kelompok tani hutan melalui pelatihan manajemen organisasi dan pengembangan usaha produktif berbasis hasil hutan.</p>
+                    <div class="news-meta">
+                      <span><i class="ri-calendar-line"></i> 8 Feb 2025</span>
+                      <a href="#" class="read-more">Baca Selengkapnya <i class="ri-arrow-right-line"></i></a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Berita 3 -->
+              <div class="col-md-6">
+                <div class="news-card animate-hover">
+                  <img src="assets/images/news/patroli.jpg" alt="Patroli Hutan" class="news-image">
+                  <div class="news-content">
+                    <span class="news-tag">Perlindungan</span>
+                    <h5>Intensifikasi Patroli Pengamanan Hutan</h5>
+                    <p>Peningkatan kegiatan patroli pengamanan hutan bersama masyarakat untuk mencegah kegiatan illegal logging dan perambahan kawasan hutan.</p>
+                    <div class="news-meta">
+                      <span><i class="ri-calendar-line"></i> 5 Feb 2025</span>
+                      <a href="#" class="read-more">Baca Selengkapnya <i class="ri-arrow-right-line"></i></a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Berita 4 -->
+              <div class="col-md-6">
+                <div class="news-card">
+                  <img src="assets/images/news/pembibitan.jpg" alt="Pembibitan" class="news-image">
+                  <div class="news-content">
+                    <span class="news-tag">Rehabilitasi</span>
+                    <h5>Pengembangan Bibit Unggul Tanaman Hutan</h5>
+                    <p>Inovasi pengembangan bibit unggul melalui teknik pembibitan modern untuk mendukung program rehabilitasi hutan dan lahan.</p>
+                    <div class="news-meta">
+                      <span><i class="ri-calendar-line"></i> 1 Feb 2025</span>
+                      <a href="#" class="read-more">Baca Selengkapnya <i class="ri-arrow-right-line"></i></a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-center mt-4">
+              <a href="#" class="btn btn-outline-success">
+                Lihat Semua Berita <i class="ri-arrow-right-line"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Sidebar Dokumen -->
+          <div class="col-lg-4" data-aos="fade-up">
+            <div class="sidebar-box">
+              <h4 class="sidebar-title">Dokumen Penting</h4>
+              <div class="doc-list">
+                <a href="#" class="doc-item">
+                  <i class="ri-file-pdf-line doc-icon"></i>
+                  <div class="doc-info">
+                    <h6>Laporan Kinerja Tahun 2024</h6>
+                    <span class="doc-meta">15 Jan 2025 • PDF • 2.5 MB</span>
+                  </div>
+                </a>
+                <a href="#" class="doc-item">
+                  <i class="ri-file-word-line doc-icon"></i>
+                  <div class="doc-info">
+                    <h6>Pedoman Teknis Rehabilitasi Hutan</h6>
+                    <span class="doc-meta">10 Jan 2025 • DOC • 1.8 MB</span>
+                  </div>
+                </a>
+                <a href="#" class="doc-item">
+                  <i class="ri-file-excel-line doc-icon"></i>
+                  <div class="doc-info">
+                    <h6>Data Statistik Kehutanan 2024</h6>
+                    <span class="doc-meta">5 Jan 2025 • XLS • 1.2 MB</span>
+                  </div>
+                </a>
+                <a href="#" class="doc-item">
+                  <i class="ri-file-pdf-line doc-icon"></i>
+                  <div class="doc-info">
+                    <h6>Rencana Kerja Tahunan 2025</h6>
+                    <span class="doc-meta">1 Jan 2025 • PDF • 3.1 MB</span>
+                  </div>
+                </a>
+              </div>
+              <div class="text-center mt-4">
+                <a href="#" class="btn btn-outline-success btn-sm">
+                  Lihat Semua Dokumen <i class="ri-arrow-right-line"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="galeri" class="gallery-section">
+      <div class="container">
+        <div class="section-header text-center" data-aos="fade-up">
+          <h2>Galeri Kegiatan</h2>
+          <p class="section-subheading">Dokumentasi program dan kegiatan kehutanan</p>
+        </div>
+
+        <!-- Gallery Filter -->
+        <div class="gallery-filter d-flex justify-content-center" data-aos="fade-up">
+          <button class="btn btn-outline-success active" data-filter="all">Semua</button>
+          <button class="btn btn-outline-success" data-filter="penanaman">Penanaman</button>
+          <button class="btn btn-outline-success" data-filter="penyuluhan">Penyuluhan</button>
+          <button class="btn btn-outline-success" data-filter="pembibitan">Pembibitan</button>
+        </div>
+
+        <!-- Gallery Items -->
+        <div class="row g-4 gallery-container">
+          <!-- Item Penanaman -->
+          <div class="col-lg-4 col-md-6 gallery-item penanaman" data-aos="fade-up">
+            <div class="gallery-card">
+              <div class="gallery-image">
+                <img src="assets/images/gallery/penanaman.jpg" alt="Kegiatan Penanaman">
+                <div class="gallery-overlay">
+                  <a href="assets/images/gallery/penanaman.jpg" class="gallery-popup">
+                    <i class="ri-zoom-in-line"></i>
+                  </a>
+                </div>
+              </div>
+              <div class="gallery-content">
+                <h5>Program Penanaman Pohon</h5>
+                <p>Penanaman 10.000 bibit pohon bersama masyarakat</p>
+                <div class="gallery-meta">
+                  <span><i class="ri-calendar-line"></i> 15 Januari 2024</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Item Penyuluhan -->
+          <div class="col-lg-4 col-md-6 gallery-item penyuluhan" data-aos="fade-up" data-aos-delay="100">
+            <div class="gallery-card">
+              <div class="gallery-image">
+                <img src="assets/images/gallery/penyuluhan.jpeg" alt="Kegiatan Penyuluhan">
+                <div class="gallery-overlay">
+                  <a href="assets/images/gallery/penyuluhan.jpeg" class="gallery-popup">
+                    <i class="ri-zoom-in-line"></i>
+                  </a>
+                </div>
+              </div>
+              <div class="gallery-content">
+                <h5>Penyuluhan Kehutanan</h5>
+                <p>Sosialisasi program perhutanan sosial</p>
+                <div class="gallery-meta">
+                  <span><i class="ri-calendar-line"></i> 20 Januari 2024</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Item Pembibitan -->
+          <div class="col-lg-4 col-md-6 gallery-item pembibitan" data-aos="fade-up" data-aos-delay="200">
+            <div class="gallery-card">
+              <div class="gallery-image">
+                <img src="assets/images/gallery/pembibitan.jpeg" alt="Kegiatan Pembibitan">
+                <div class="gallery-overlay">
+                  <a href="assets/images/gallery/pembibitan.jpeg" class="gallery-popup">
+                    <i class="ri-zoom-in-line"></i>
+                  </a>
+                </div>
+              </div>
+              <div class="gallery-content">
+                <h5>Pembibitan Tanaman</h5>
+                <p>Pengembangan bibit unggul di persemaian</p>
+                <div class="gallery-meta">
+                  <span><i class="ri-calendar-line"></i> 25 Januari 2024</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Kontak Section -->
+    <section id="kontak" class="contact-section">
+      <div class="container">
+        <div class="section-header text-center" data-aos="fade-up">
+          <h2>Hubungi Kami</h2>
+          <p class="section-subheading">Informasi kontak dan pelayanan</p>
+        </div>
+
+        <div class="row g-4">
+          <!-- Informasi Kontak -->
+          <div class="col-lg-4" data-aos="fade-up">
+            <div class="contact-info">
+              <div class="contact-info-item">
+                <i class="fas fa-map-marker-alt contact-icon"></i>
+                <div>
+                  <h5>Alamat Kantor</h5>
+                  <p>Jl. Hayam Wuruk No. 9, Bojonegoro, Jawa Timur</p>
+                </div>
+              </div>
+              <div class="contact-info-item">
+                <i class="fas fa-phone contact-icon"></i>
+                <div>
+                  <h5>Telepon</h5>
+                  <p>(0353) 123456</p>
+                  <p>Hotline: 0800-1234-5678</p>
+                </div>
+              </div>
+              <div class="contact-info-item">
+                <i class="fas fa-envelope contact-icon"></i>
+                <div>
+                  <h5>Email</h5>
+                  <p>info@cdk-bojonegoro.jatimprov.go.id</p>
+                </div>
+              </div>
+              <div class="contact-info-item">
+                <i class="fas fa-clock contact-icon"></i>
+                <div>
+                  <h5>Jam Pelayanan</h5>
+                  <p>Senin - Jumat: 08:00 - 16:00 WIB</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Kontak -->
+          <div class="col-lg-8" data-aos="fade-up" data-aos-delay="100">
+            <div class="contact-form-container">
+              <form class="contact-form">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="nama">Nama Lengkap</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="nama"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="email">Email</label>
+                      <input
+                        type="email"
+                        class="form-control"
+                        id="email"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="telepon">Nomor Telepon</label>
+                      <input type="tel" class="form-control" id="telepon" />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="kategori">Kategori</label>
+                      <select class="form-select" id="kategori" required>
+                        <option value="">Pilih Kategori</option>
+                        <option value="perizinan">Perizinan</option>
+                        <option value="pengaduan">Pengaduan</option>
+                        <option value="informasi">Informasi</option>
+                        <option value="lainnya">Lainnya</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label for="pesan">Pesan</label>
+                      <textarea
+                        class="form-control"
+                        id="pesan"
+                        rows="5"
+                        required
+                      ></textarea>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <button type="submit" class="btn btn-success">
+                      Kirim Pesan
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer bg-dark text-white">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-lg-4">
+            <div class="footer-info">
+              <img
+                src="assets/images/logo-white.png"
+                alt="Logo"
+                height="60"
+                class="mb-3"
+              />
+              <p>Cabang Dinas Kehutanan Wilayah Bojonegoro</p>
+              <div class="social-links mt-3">
+                <a href="#" class="social-icon"
+                  ><i class="fab fa-facebook-f"></i
+                ></a>
+                <a href="#" class="social-icon"
+                  ><i class="fab fa-twitter"></i
+                ></a>
+                <a href="#" class="social-icon"
+                  ><i class="fab fa-instagram"></i
+                ></a>
+                <a href="#" class="social-icon"
+                  ><i class="fab fa-youtube"></i
+                ></a>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-2">
+            <h5>Link Cepat</h5>
+            <ul class="footer-links">
+              <li><a href="#beranda">Beranda</a></li>
+              <li><a href="#profil">Profil</a></li>
+              <li><a href="#layanan">Layanan</a></li>
+              <li><a href="#program">Program</a></li>
+            </ul>
+          </div>
+          <div class="col-lg-3">
+            <h5>Layanan Utama</h5>
+            <ul class="footer-links">
+              <li><a href="#">Perizinan Kehutanan</a></li>
+              <li><a href="#">Perhutanan Sosial</a></li>
+              <li><a href="#">Rehabilitasi Hutan</a></li>
+              <li><a href="#">Penyuluhan Kehutanan</a></li>
+              <li><a href="#">Pengaduan</a></li>
+            </ul>
+          </div>
+          <div class="col-lg-3">
+            <h5>Informasi Penting</h5>
+            <ul class="footer-links">
+              <li><a href="#">Prosedur Pelayanan</a></li>
+              <li><a href="#">Standar Pelayanan</a></li>
+              <li><a href="#">Maklumat Pelayanan</a></li>
+              <li><a href="#">Peraturan Terkait</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom mt-4">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6">
+              <p class="mb-0">
+                &copy; 2025 CDK Wilayah Bojonegoro. Hak Cipta Dilindungi.
+              </p>
+            </div>
+            <div class="col-md-6 text-md-end">
+              <a href="#" class="text-white me-3">Kebijakan Privasi</a>
+              <a href="#" class="text-white">Syarat & Ketentuan</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="back-to-top">
+      <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Modal Preview Image -->
+    <div class="modal-preview" id="imageModal" style="display: none;">
+      <span class="modal-close">&times;</span>
+      <img id="modalImage" src="" alt="Preview Image">
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script>
+    // Particles Config
+    particlesJS("particles-js", {
+      particles: {
+        number: {
+          value: 40,
+          density: {
+            enable: true,
+            value_area: 800
+          }
+        },
+        color: {
+          value: "#ffffff"
+        },
+        opacity: {
+          value: 0.3,
+          random: false
+        },
+        size: {
+          value: 2,
+          random: true
+        },
+        line_linked: {
+          enable: true,
+          distance: 150,
+          color: "#ffffff",
+          opacity: 0.2,
+          width: 1
+        },
+        move: {
+          enable: true,
+          speed: 3,
+          direction: "none",
+          random: false,
+          straight: false,
+          out_mode: "out",
+          bounce: false
+        }
+      },
+      interactivity: {
+        detect_on: "canvas",
+        events: {
+          onhover: {
+            enable: true,
+            mode: "repulse"
+          },
+          resize: true
+        }
+      },
+      retina_detect: true
+    });
+
+    // Update ScrollReveal configuration
+    const scrollReveal = ScrollReveal({
+      distance: '20px',
+      duration: 800,
+      delay: 0,
+      easing: 'ease-out',
+      reset: false,
+      useDelay: 'once',
+      viewFactor: 0.1
+    });
+
+    // Hapus animasi dari section headers
+    scrollReveal.reveal('.section-header', {
+      distance: '0px',
+      opacity: 1,
+      scale: 1,
+      viewFactor: 0,
+      beforeReveal: function(domEl) {
+        domEl.style.opacity = '1';
+        domEl.style.transform = 'none';
+      }
+    });
+
+    // Animasi hanya untuk content
+    scrollReveal.reveal('.section-content, .dashboard-card', {
+      delay: 200,
+      distance: '30px',
+      origin: 'bottom',
+      interval: 100,
+      viewFactor: 0.2,
+      beforeReveal: function(domEl) {
+        // Pastikan section header tetap di atas
+        const header = domEl.closest('section').querySelector('.section-header');
+        if (header) {
+          header.style.zIndex = '10';
+        }
+      }
+    });
+    </script>
+  </body>
+</html>
